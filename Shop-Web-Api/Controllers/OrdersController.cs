@@ -33,7 +33,7 @@ namespace Shop_Web_Api.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
-        { 
+        {
             var userID = HttpContext.GetUserId();
             return Ok(await _orderService.GetOrdersAsync(userID));
         }

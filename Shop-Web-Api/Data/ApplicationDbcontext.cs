@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shop_Web_Api.Models;
 
 namespace Shop_Web_Api.Data
@@ -26,25 +27,39 @@ namespace Shop_Web_Api.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<ProductCategory>()
-                .HasKey(bc => new { bc.ProductID, bc.CategoryID });
-            modelBuilder.Entity<ProductCategory>()
+            modelBuilder.ApplyConfiguration(new ProductCategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderProductConfiguration());
+        }
+    }
+
+    public class ProductCategoryConfiguration : IEntityTypeConfiguration<ProductCategory>
+    {
+        public void Configure(EntityTypeBuilder<ProductCategory> builder)
+        {
+            builder
+                .HasKey(bc => new {bc.ProductID, bc.CategoryID});
+            builder
                 .HasOne(bc => bc.Product)
                 .WithMany(b => b.ProductCategories)
                 .HasForeignKey(bc => bc.ProductID);
-            modelBuilder.Entity<ProductCategory>()
+            builder
                 .HasOne(bc => bc.Category)
                 .WithMany(c => c.ProductCategories)
                 .HasForeignKey(bc => bc.CategoryID);
+        }
+    }
 
-
-            modelBuilder.Entity<OrderProduct>()
-                .HasKey(bc => new { bc.OrderID, bc.ProductID });
-            modelBuilder.Entity<OrderProduct>()
+    public class OrderProductConfiguration : IEntityTypeConfiguration<OrderProduct>
+    {
+        public void Configure(EntityTypeBuilder<OrderProduct> builder)
+        {
+            builder
+                .HasKey(bc => new {bc.OrderID, bc.ProductID});
+            builder
                 .HasOne(bc => bc.Order)
                 .WithMany(b => b.OrderProducts)
                 .HasForeignKey(bc => bc.OrderID);
-            modelBuilder.Entity<OrderProduct>()
+            builder
                 .HasOne(bc => bc.Product)
                 .WithMany(c => c.OrderProducts)
                 .HasForeignKey(bc => bc.ProductID);
